@@ -9,8 +9,13 @@
 
 int main(void/* int argc, char* argv[] */) {
 
-    App app;
+    // create an app
+    struct App app;
+
+    // initialize the device with a window title
 	device_init(&app, "Origami");
+
+    // run the engine
     return device_run(&app.device);
 
 }

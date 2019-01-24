@@ -1,4 +1,5 @@
 #include "app.h"
+#include "matrix.h"
 #include "device_structs.h"
 #include "device_interface.h"
 #include "tuple_interface.h"
@@ -8,13 +9,15 @@
 #include <stdio.h>
 #include <string.h>
 
-void app_on_device_init(App* self) {
+void app_on_device_init(struct App* self) {
+    memcpy(self->device.camera,identity_f32, 16 * sizeof(f32));
+
     device_set_clear_color(&self->device, f32_3t_new(.95f, .95f, 1.0f));
     device_set_vsync(&self->device, ON);
 
-    const usize width = 20;
-    const usize height = 20;
-    const usize dimens = width * height;
+    const u16 width = 20;
+    const u16 height = 20;
+    const u16 dimens = width * height;
 
     // width * height * depth
     u8 pixels[20 * 20 * 4] = { 0 };
@@ -35,18 +38,18 @@ void app_on_device_init(App* self) {
     device_set_cursor(&self->device, &cursor);
 }
 
-void app_on_file_dropped(App* self, const char* filename, const char* extension) {
+void app_on_file_dropped(struct App* self, const char* filename, const char* extension) {
     printf("file dropped with name: %s, extension: %s\n", filename, extension);
 }
 
-void app_on_key_event(App* self, EventState state, KeyData key) {
+void app_on_key_event(struct App* self, EventState state, KeyData key) {
     printf("key event\n");
 }
 
-void app_on_touch_event(App* self, EventState state, f64_2t pos) {
+void app_on_touch_event(struct App* self, EventState state, f64_2t pos) {
     //printf("touch event\n");
 }
 
-void app_on_window_resized(App* self, u32_2t size) {
+void app_on_window_resized(struct App* self, u32_2t size) {
     printf("Window Resized: (%u, %u)\n", size.x, size.y);
 }

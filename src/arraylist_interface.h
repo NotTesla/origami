@@ -1,18 +1,16 @@
-// NEVER include this in a header file
+// Warning: never include this in a header file
 
 #ifndef TYPE
 #error "arraylist_interface.h was included, but TYPE was undefined"
 #else
 
-#ifndef LIST
-#error "arraylist_interface.h was included, but LIST was undefined"
-#else
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
 
-#include "stdlib.h"
-#include "string.h"
-#include "stddef.h"
+#include "common_macros.h"
 
-#define APPEND(x, y) x ## y
+#define LIST ARRAY_LIST(TYPE)
 
 #define PUSH(x) APPEND(x, _push)
 // Push an item onto the top of the vector
@@ -81,7 +79,7 @@ struct LIST WITH_CAPACITY(LIST)(usize capacity) {
 #define WITH_ARRAY(x) APPEND(x, _with_array)
 // Initialize an arraylist with a given array
 // arr: the data to fill the arraylist with
-// len: the length of the initial arrya
+// len: the length of the initial array
 //
 // return: an arraylist containing arr
 struct LIST WITH_ARRAY(LIST)(const TYPE* arr, usize len) {
@@ -101,10 +99,9 @@ void FREE(LIST)(struct LIST* self) {
 }
 
 // TODO: set/get individual elements
-// TODO: add/remove range of elements
+// TODO: add/remove/insert range of elements
 
 #undef TYPE
 #undef LIST
 
-#endif
 #endif

@@ -6,11 +6,9 @@
 #include <math.h>
 
 #define TYPE f32_2t
-#define LIST arraylist_f32_2t
 #include "arraylist_interface.h"
 
-#define TYPE i32
-#define LIST arraylist_i32
+#define TYPE u32_3t
 #include "arraylist_interface.h"
 
 const char* fragment =
@@ -85,26 +83,39 @@ GLuint create_program(const char* fsh, const char* vsh) {
     return program;
 }
 
-void create_vbuffer(struct Mesh* self) {
+void create_vertex_buffer(struct Mesh* self) {
+    
+    // generate vertex array
     glGenVertexArrays(1, &self->gl_varray);
     glBindVertexArray(self->gl_varray);
 
+    // generate vertex buffer
     glGenBuffers(1, &self->gl_vbuffer);
     glBindBuffer(
         GL_ARRAY_BUFFER,
         self->gl_vbuffer);
-    
     glBufferData(
         GL_ARRAY_BUFFER,
-        self->vertices.len * sizeof(self->vertices),
+        self->vertices.len * sizeof(*self->vertices.data),
         self->vertices.data,
+        GL_STATIC_DRAW);
+
+    // generate index buffer
+    glGenBuffers(1, &self->gl_ibuffer);
+    glBindBuffer(
+        GL_ELEMENT_ARRAY_BUFFER,
+        self->gl_ibuffer);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        self->indices.len * sizeof(*self->indices.data),
+        self->indices.data,
         GL_STATIC_DRAW);
 }
 
 static const f32 mat[16] = {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
+    0.5f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.5f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.5f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
@@ -115,26 +126,17 @@ void mult(f32 mat[16], f32_3t m) {
     mat[15] = 1.0f;
 }
 
-f32_4t mul(f32 mat[16], f32_2t vec) {
-
-}
-
-void prntf(f32 mat[16]) {
-    for (int i = 0; i < 4; ++i) {
-        for (int j = 0; j < 4; ++j) {
-            printf("%.2f, ", mat[i + j * 4]);
-        }
-        printf("\n");
-    }
-    printf("\n\n--------\n");
-}
-
 struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
+    u32_3t tris[2] = {
+        {.x=0, .y=1, .z=2},
+        {.x=1, .y=2, .z=3}
+    };
+
     struct Mesh mesh;
-    mesh.indices = arraylist_i32_with_capacity(5);
+    mesh.indices = arraylist_u32_3t_with_array(tris, 2);
     mesh.vertices = arraylist_f32_2t_with_array(vertices, len);
 
-    create_vbuffer(&mesh);
+    create_vertex_buffer(&mesh);
     mesh.gl_program = create_program(fragment, vertex);
 
     mesh.gl_camera = glGetUniformLocation(mesh.gl_program, "camera");
@@ -148,34 +150,37 @@ struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
 
 void mesh_free(struct Mesh* mesh) {
     arraylist_f32_2t_free(&mesh->vertices);
-    arraylist_i32_free(&mesh->indices);
+    arraylist_u32_3t_free(&mesh->indices);
 }
 
-void mesh_draw(struct Mesh* self) {
+void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
 
     glUseProgram(self->gl_program);
 
-    f32_3t offs = { .x = (f32)sin(glfwGetTime()), .y = (f32)cos(glfwGetTime()), .z = 0.0f };
+    f32_3t offs = { .x = (f32)sin(glfwGetTime()), .y = 0.0f, .z = 0.0f };
     mult(self->mat4x4, offs);
-    prntf(self->mat4x4);
+
+    // TODO: uncomment to use camera
+    //glUniformMatrix4fv(self->shader->gl_camera, 1, GL_FALSE, camera);
+
     glUniformMatrix4fv(self->gl_mat4_id, 1, GL_FALSE, self->mat4x4);
 
-    f32 col[4] = { (f32)sin(glfwGetTime()), (f32)cos(glfwGetTime() * 3.14), .5f, 1.0f };
+    f32 col[4] = { offs.x, offs.y, .5f, 1.0f };
     glUniform4fv(self->gl_color3f, 1, col);
 
-    // 1st attribute buffer : vertices
+    // begin vertex attribute : position
     glEnableVertexAttribArray(0);
+
+    // bind vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, self->gl_vbuffer);
     glVertexAttribPointer(
-        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        2,                  // size
-        GL_FLOAT,           // type
-        GL_FALSE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
-    );
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0, self->vertices.len); // Starting from vertex 0; 3 vertices total -> 1 triangle
+        0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    //glDrawArrays(GL_TRIANGLES, 0, self->vertices.len); // Starting from vertex 0; 3 vertices total -> 1 triangle
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->gl_ibuffer);
+    glDrawElements(GL_TRIANGLES, (GLsizei)self->indices.len * 3, GL_UNSIGNED_INT, (void*)0);
+
+    // end vertice attribute : position
     glDisableVertexAttribArray(0);
 }
 
