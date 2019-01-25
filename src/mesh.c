@@ -96,8 +96,8 @@ void create_vertex_buffer(struct Mesh* self) {
         self->gl_vbuffer);
     glBufferData(
         GL_ARRAY_BUFFER,
-        self->vertices.len * sizeof(*self->vertices.data),
-        self->vertices.data,
+        self->hull.vertices.len * sizeof(*self->hull.vertices.data),
+        self->hull.vertices.data,
         GL_STATIC_DRAW);
 
     // generate index buffer
@@ -107,8 +107,8 @@ void create_vertex_buffer(struct Mesh* self) {
         self->gl_ibuffer);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        self->indices.len * sizeof(*self->indices.data),
-        self->indices.data,
+        self->hull.indices.len * sizeof(*self->hull.indices.data),
+        self->hull.indices.data,
         GL_STATIC_DRAW);
 }
 
@@ -133,8 +133,8 @@ struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
     };
 
     struct Mesh mesh;
-    mesh.indices = arraylist_u32_3t_with_array(tris, 2);
-    mesh.vertices = arraylist_f32_2t_with_array(vertices, len);
+    mesh.hull.indices = arraylist_u32_3t_with_array(tris, 2);
+    mesh.hull.vertices = arraylist_f32_2t_with_array(vertices, len);
 
     create_vertex_buffer(&mesh);
     mesh.gl_program = create_program(fragment, vertex);
@@ -149,8 +149,8 @@ struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
 }
 
 void mesh_free(struct Mesh* mesh) {
-    arraylist_f32_2t_free(&mesh->vertices);
-    arraylist_u32_3t_free(&mesh->indices);
+    arraylist_f32_2t_free(&mesh->hull.vertices);
+    arraylist_u32_3t_free(&mesh->hull.indices);
 }
 
 void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
@@ -178,9 +178,8 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
 
     //glDrawArrays(GL_TRIANGLES, 0, self->vertices.len); // Starting from vertex 0; 3 vertices total -> 1 triangle
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->gl_ibuffer);
-    glDrawElements(GL_TRIANGLES, (GLsizei)self->indices.len * 3, GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_TRIANGLES, (GLsizei)self->hull.indices.len * 3, GL_UNSIGNED_INT, (void*)0);
 
     // end vertice attribute : position
     glDisableVertexAttribArray(0);
 }
-

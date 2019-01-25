@@ -15,6 +15,11 @@ struct Shader {
     u32 gl_color3f;
 };
 
+struct Shape {
+    struct arraylist_u32_3t indices;
+    struct arraylist_f32_2t vertices;
+};
+
 // TODO: Mesh should be split into multiple components
 // Shape(memcpy)    - vertex and triangle buffers
 // Material(shared) - gl_program, attributes (gl_camera, gl_color, etc)
@@ -33,9 +38,7 @@ struct Mesh {
     u32 gl_camera;
 
     f32 mat4x4[16];
-
-    struct arraylist_u32_3t indices;
-    struct arraylist_f32_2t vertices;
+    struct Shape hull;
 };
 
 // initialize a mesh with a given set of vertices

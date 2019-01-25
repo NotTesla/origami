@@ -1,5 +1,4 @@
 #include "app.h"
-#include "matrix.h"
 #include "device_structs.h"
 #include "device_interface.h"
 #include "tuple_interface.h"
@@ -10,7 +9,13 @@
 #include <string.h>
 
 void app_on_device_init(struct App* self) {
-    memcpy(self->device.camera,identity_f32, 16 * sizeof(f32));
+    f32 identity[4][4] = {
+        { 1.0f, 0.0f, 0.0f, 0.0f },
+        { 0.0f, 1.0f, 0.0f, 0.0f },
+        { 0.0f, 0.0f, 1.0f, 0.0f },
+        { 0.0f, 0.0f, 0.0f, 1.0f }
+    };
+    memcpy(self->device.camera, identity, 16 * sizeof(f32));
 
     device_set_clear_color(&self->device, f32_3t_new(.95f, .95f, 1.0f));
     device_set_vsync(&self->device, ON);
