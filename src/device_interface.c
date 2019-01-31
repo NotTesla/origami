@@ -130,13 +130,14 @@ void device_init(struct App* app, const char* title) {
     glfwSetWindowSizeCallback(window, on_window_resize);
     glPolygonMode(GL_FRONT_AND_BACK, GL_POLYGON_MODE);
 
-    f32_2t tri[4] = {
-        {.x = -1.0f,.y = -1.0f},
-        {.x = -1.0f,.y = 1.0f},
-        {.x = 1.0f,.y = -1.0f},
-        {.x = 1.0f,.y = 1.0f} };
+    i32_2t square[4] = {
+        { .x =-200, .y =-200 },
+        { .x =-200, .y = 200 },
+        { .x = 200, .y =-200 },
+        { .x = 200, .y = 200 }
+    };
 
-    m = mesh_with_vertices(tri, 4);
+    m = mesh_with_vertices(square, 4);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

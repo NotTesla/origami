@@ -20,8 +20,6 @@ typedef uint64_t u64;
 typedef float f32;
 typedef double f64;
 
-typedef size_t usize;
-
 // you must free this string yourself
 typedef char* free_str;
 

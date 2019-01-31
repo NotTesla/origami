@@ -2,22 +2,12 @@
 #define __MATERIAL_H__
 
 #include "tuple_structs.h"
+#include "shape.h"
 
-#define TYPE f32_2t
-#include "arraylist_schema.h"
-
-#define TYPE u32_3t
-#include "arraylist_schema.h"
-
-struct Shader {
+struct Material {
     u32 gl_program;
-    u32 gl_mat4_id;
-    u32 gl_color3f;
-};
-
-struct Shape {
-    struct arraylist_u32_3t indices;
-    struct arraylist_f32_2t vertices;
+    u32 uni_color;
+    u32 shader_camera;
 };
 
 // TODO: Mesh should be split into multiple components
@@ -38,13 +28,13 @@ struct Mesh {
     u32 gl_camera;
 
     f32 mat4x4[16];
-    struct Shape hull;
+    struct Shape shape;
 };
 
 // initialize a mesh with a given set of vertices
 // vertices - the vertex array
 // len      j- the length of the vertex array
-struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len);
+struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len);
 
 // frees a mesh heap allocated resources
 void mesh_free(struct Mesh* mesh);

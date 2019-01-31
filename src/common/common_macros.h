@@ -7,4 +7,7 @@
 // define an array list
 #define ARRAY_LIST(x) APPEND(arraylist_, x)
 
+// define a fat array
+#define ARRAY_FAT(x) APPEND(array_, x)
+
 #endif // __COMMON_MACROS_H__

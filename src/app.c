@@ -17,7 +17,7 @@ void app_on_device_init(struct App* self) {
     };
     memcpy(self->device.camera, identity, 16 * sizeof(f32));
 
-    device_set_clear_color(&self->device, f32_3t_new(.95f, .95f, 1.0f));
+    device_set_clear_color(&self->device, (f32_3t){.x=.95f,.y=.95f,.z=1.0f});
     device_set_vsync(&self->device, ON);
 
     const u16 width = 20;

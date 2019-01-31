@@ -11,7 +11,7 @@ set(DEPS "../deps")
 set(GLFW_PATH "${DEPS}/glfw-3.2.1")
 set(RES_PATH "../res")
 
-FILE(GLOB ORIGAMI *.c)
+FILE(GLOB ORIGAMI *.c common/*.c)
 # set(ORIGAMI "app.c" "device_interface.c" "file_utils.c" "main.c" "tuple_interface.c" "utils.c")
 # set(SHADERS "${RES_PATH}/shaders/default.vsh" "${RES_PATH}/shaders/default.fsh")
 
@@ -25,7 +25,7 @@ add_executable (origami WIN32 ${ORIGAMI} "${GLFW_PATH}/include/GLFW/glfw3.h" "${
 add_executable (origami_debug ${ORIGAMI} "${GLFW_PATH}/include/GLFW/glfw3.h" "${DEPS}/glad.c")
 
 set(BINARIES origami origami_debug)
-set(INCLUDES "${GLFW_PATH}/include/" "${DEPS}")
+set(INCLUDES "${GLFW_PATH}/include/" "common/" "${DEPS}")
 set(LIBRARIES "${GLFW_LIB}")
 
 # TODO: this is redundant... didn't seem to work when I used ${BINARIES} though...

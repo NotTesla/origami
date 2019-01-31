@@ -10,14 +10,16 @@
 
 #include "common_macros.h"
 
+#ifndef LIST
 #define LIST ARRAY_LIST(TYPE)
+#endif
 
 #define PUSH(x) APPEND(x, _push)
 // Push an item onto the top of the vector
 // self: the given list
 // item: the item to add
 void PUSH(LIST)(struct LIST* self, TYPE item) {
-    usize capacity = self->capacity;
+    size_t capacity = self->capacity;
 
     if (self->len == capacity) {
         capacity *= 2;
@@ -39,7 +41,7 @@ void PUSH(LIST)(struct LIST* self, TYPE item) {
 TYPE POP(LIST)(struct LIST* self) {
     // TODO: implement error handling
     // TODO: create a rust-style "option" type
-    usize index = self->len - 1;
+    size_t index = self->len - 1;
     --self->len;
     return self->data[index];
 }
@@ -51,7 +53,7 @@ TYPE POP(LIST)(struct LIST* self) {
 // index: the index to remove the item at
 //
 // return: the item that was removed
-TYPE REMOVE_AT(LIST)(struct LIST* self, usize index) {
+TYPE REMOVE_AT(LIST)(struct LIST* self, size_t index) {
     TYPE item = self->data[index];
     --self->len;
     memcpy(&self->data[index], &self->data[index + 1], sizeof(TYPE) * (self->len - index));
@@ -59,11 +61,11 @@ TYPE REMOVE_AT(LIST)(struct LIST* self, usize index) {
 }
 
 #define WITH_CAPACITY(x) APPEND(x, _with_capacity)
-// Initialize a arraylist with a given capacity
+// Initialize an arraylist with a given capacity
 // capacity: the capacity to initialize the list with
 //
 // return: a list with a given capacity, of length 0
-struct LIST WITH_CAPACITY(LIST)(usize capacity) {
+struct LIST WITH_CAPACITY(LIST)(size_t capacity) {
     if (capacity == 0) capacity = 1;
     struct LIST self;
     self.data = (TYPE*)malloc(sizeof(TYPE) * capacity);
@@ -82,7 +84,7 @@ struct LIST WITH_CAPACITY(LIST)(usize capacity) {
 // len: the length of the initial array
 //
 // return: an arraylist containing arr
-struct LIST WITH_ARRAY(LIST)(const TYPE* arr, usize len) {
+struct LIST WITH_ARRAY(LIST)(const TYPE* arr, size_t len) {
     struct LIST self = WITH_CAPACITY(LIST)(len);
     memcpy(self.data, arr, sizeof(TYPE) * len);
     self.len = len;
@@ -91,9 +93,7 @@ struct LIST WITH_ARRAY(LIST)(const TYPE* arr, usize len) {
 }
 
 #define FREE(x) APPEND(x, _free)
-// 
-// 
-// 
+// free the internal array from memory
 void FREE(LIST)(struct LIST* self) {
     free(self->data);
 }

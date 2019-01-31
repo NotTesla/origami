@@ -5,12 +5,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#define TYPE f32_2t
-#include "arraylist_interface.h"
-
-#define TYPE u32_3t
-#include "arraylist_interface.h"
-
 const char* fragment =
 "#version 450 core\n"
 "in vec4 vs_color;\n"
@@ -55,10 +49,12 @@ GLuint compile_shader(GLenum type, const char* src) {
 
 GLuint create_program(const char* fsh, const char* vsh) {
     GLuint program = glCreateProgram();
-    GLuint shaders[2];
 
-    shaders[0] = compile_shader(GL_VERTEX_SHADER, vsh);
-    shaders[1] = compile_shader(GL_FRAGMENT_SHADER, fsh);
+    // compile vertex and fragment shaders
+    GLuint shaders[2] = {
+        compile_shader(GL_VERTEX_SHADER, vsh),
+        compile_shader(GL_FRAGMENT_SHADER, fsh)
+    };
 
     for (u32 i = 0; i < 2; ++i) {
         glAttachShader(program, shaders[i]);
@@ -96,8 +92,8 @@ void create_vertex_buffer(struct Mesh* self) {
         self->gl_vbuffer);
     glBufferData(
         GL_ARRAY_BUFFER,
-        self->hull.vertices.len * sizeof(*self->hull.vertices.data),
-        self->hull.vertices.data,
+        self->shape.hull.len * sizeof(*self->shape.hull.data),
+        self->shape.hull.data,
         GL_STATIC_DRAW);
 
     // generate index buffer
@@ -107,15 +103,15 @@ void create_vertex_buffer(struct Mesh* self) {
         self->gl_ibuffer);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        self->hull.indices.len * sizeof(*self->hull.indices.data),
-        self->hull.indices.data,
+        self->shape.indices.len * sizeof(*self->shape.indices.data),
+        self->shape.indices.data,
         GL_STATIC_DRAW);
 }
 
 static const f32 mat[16] = {
-    0.5f, 0.0f, 0.0f, 0.0f,
-    0.0f, 0.5f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.5f, 0.0f,
+    .0019f, 0.0f, 0.0f, 0.0f,
+    0.0f, .0019f, 0.0f, 0.0f,
+    0.0f, 0.0f, .0019f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
@@ -126,15 +122,14 @@ void mult(f32 mat[16], f32_3t m) {
     mat[15] = 1.0f;
 }
 
-struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
+struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
     u32_3t tris[2] = {
         {.x=0, .y=1, .z=2},
         {.x=1, .y=2, .z=3}
     };
 
     struct Mesh mesh;
-    mesh.hull.indices = arraylist_u32_3t_with_array(tris, 2);
-    mesh.hull.vertices = arraylist_f32_2t_with_array(vertices, len);
+    mesh.shape = shape_init_basic(vertices, len, tris, 2);
 
     create_vertex_buffer(&mesh);
     mesh.gl_program = create_program(fragment, vertex);
@@ -149,16 +144,27 @@ struct Mesh mesh_with_vertices(const f32_2t* vertices, usize len) {
 }
 
 void mesh_free(struct Mesh* mesh) {
-    arraylist_f32_2t_free(&mesh->hull.vertices);
-    arraylist_u32_3t_free(&mesh->hull.indices);
+    shape_free(&mesh->shape);
 }
 
 void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
 
+    // TODO: consider batching multiple meshes that share the same material
+    // into a hashmap<gl_program, arraylist<Mesh>>, then iterate through hashmap
+    // call use program, then iterate through it's arraylist and draw meshes
+    // if performance becomes an issue here
     glUseProgram(self->gl_program);
 
-    f32_3t offs = { .x = (f32)sin(glfwGetTime()), .y = 0.0f, .z = 0.0f };
-    mult(self->mat4x4, offs);
+    f32_3t offs = { .x = (f32)sin(glfwGetTime() * 2.0f) * 3.0f, .y = 0.0f, .z = 0.0f };
+    //mult(self->mat4x4, offs);
+
+    self->shape.hull.data[0].y = (i64)(offs.x * 200);
+
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        self->shape.hull.len * sizeof(*self->shape.hull.data),
+        self->shape.hull.data,
+        GL_STATIC_DRAW);
 
     // TODO: uncomment to use camera
     //glUniformMatrix4fv(self->shader->gl_camera, 1, GL_FALSE, camera);
@@ -174,11 +180,10 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     // bind vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, self->gl_vbuffer);
     glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        0, 2, GL_INT, GL_FALSE, 0, (void*)0);
 
-    //glDrawArrays(GL_TRIANGLES, 0, self->vertices.len); // Starting from vertex 0; 3 vertices total -> 1 triangle
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->gl_ibuffer);
-    glDrawElements(GL_TRIANGLES, (GLsizei)self->hull.indices.len * 3, GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_TRIANGLES, (GLsizei)self->shape.indices.len * 3, GL_UNSIGNED_INT, (void*)0);
 
     // end vertice attribute : position
     glDisableVertexAttribArray(0);

@@ -2,7 +2,7 @@
 #define LINMATH_H
 
 #include <math.h>
-
+// gbmath, cglm
 #ifdef _MSC_VER
 #define inline __inline
 #endif

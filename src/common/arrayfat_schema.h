@@ -1,36 +1,35 @@
-// #include INTERFACE as well to include the relevant arraylist functions
+// #include INTERFACE as well to include the relevant arrayfat functions
 // The proper way to import this header is as follows:
 
 // if you need to access the arraylist struct in a header (*.h):
 // - your_file.h
 // #define TYPE [Your Type]
-// #include "arraylist_schema.h"
+// #include "arrayfat_schema.h"
 // - your_file.c
 // #define TYPE [Your Type]
-// #include "arraylist_interface.h"
+// #include "arrayfat_interface.h"
 
 // if you only need access to arraylist from a implementation file (*.c):
 // - your_file.c
 // #define TYPE [Your Type]
 // #define INTERFACE
-// #include "arraylist_schema.h"
+// #include "arrayfat_schema.h"
 
 #ifndef TYPE
-#error "arraylist_schema.h was included, but TYPE was undefined"
+#error "arrayfat_schema.h was included, but TYPE was undefined"
 #else
 
 #include "rusty_ints.h"
 #include "common_macros.h"
 
-struct ARRAY_LIST(TYPE) {
+struct ARRAY_FAT(TYPE) {
     TYPE* data;
-    usize capacity;
-    usize len;
+    size_t len;
 };
 
 #ifdef INTERFACE
-#include "arraylist_interface.h"
 #undef INTERFACE
+#include "arrayfat_interface.h"
 #endif
 
 #undef TYPE
