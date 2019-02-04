@@ -13,7 +13,10 @@
 #define TYPE Vertices
 #include "arrayfat_interface.h"
 
-struct Shape shape_init_basic(i32_2t* hull, size_t h_len, u32_3t* tris, size_t t_len) {
+struct Shape shape_init_basic(
+    const i32_2t* hull, size_t h_len,
+    const u32_3t* tris, size_t t_len) {
+
     struct Shape self;
     self.hull = arraylist_i32_2t_with_array(hull, h_len);
     self.indices = arraylist_u32_3t_with_array(tris, t_len);
@@ -32,11 +35,15 @@ struct Shape shape_copy(struct Shape* cp) {
     self.holes = array_Vertices_with_array(cp->holes.data, cp->holes.len);
 
     for (size_t i = 0; i < self.holes.len; ++i) {
-        self.holes.data[i] = arraylist_i32_2t_with_array(cp->holes.data[i].data, cp->holes.data[i].len);
+        self.holes.data[i] = 
+            arraylist_i32_2t_with_array(
+                cp->holes.data[i].data,
+                cp->holes.data[i].len);
     }
 
     // copy the shape indices
-    self.indices = arraylist_u32_3t_with_array(cp->indices.data, cp->indices.len);
+    self.indices =
+        arraylist_u32_3t_with_array(cp->indices.data, cp->indices.len);
 
     return self;
 }

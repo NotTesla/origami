@@ -7,10 +7,11 @@
 
 const char* fragment =
 "#version 450 core\n"
-"in vec4 vs_color;\n"
-"out vec4 color;\n"
+"varying vec4 vs_color;\n"
+"varying vec2 uv;\n"
 "void main(void) {\n"
-"    color = vs_color;\n"
+"    //gl_FragColor = vs_color;\n"
+"   gl_FragColor.rgba = vec4(uv.x, uv.y, .5, 1.0);\n"
 "}";
 
 const char* vertex =
@@ -19,9 +20,14 @@ const char* vertex =
 "uniform mat4 camera;\n"
 "uniform mat4 transform;\n"
 "uniform vec4 color;\n"
-"out vec4 vs_color;\n"
+"varying vec2 uv;\n"
+"varying vec4 vs_color;\n"
 "void main(void) {\n"
-"    gl_Position = transform * vec4(position, 0.0, 1.0);\n"
+"    mat4 scale = mat4(0.0);\n"
+"    scale[0][0] = scale[1][1] = scale[2][2] = 0.005;\n"
+"    scale[3][3] = 1.0;\n"
+"    gl_Position = transform * scale * vec4(position, 0.0, 1.0);\n"
+"    uv = position;\n"
 "    vs_color = color;\n"
 "}";
 
@@ -109,9 +115,9 @@ void create_vertex_buffer(struct Mesh* self) {
 }
 
 static const f32 mat[16] = {
-    .0019f, 0.0f, 0.0f, 0.0f,
-    0.0f, .0019f, 0.0f, 0.0f,
-    0.0f, 0.0f, .0019f, 0.0f,
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
@@ -124,8 +130,8 @@ void mult(f32 mat[16], f32_3t m) {
 
 struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
     u32_3t tris[2] = {
-        {.x=0, .y=1, .z=2},
-        {.x=1, .y=2, .z=3}
+        {.x=0, .y=1, .z=3},
+        {.x=1, .y=3, .z=2}
     };
 
     struct Mesh mesh;
@@ -155,23 +161,28 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     // if performance becomes an issue here
     glUseProgram(self->gl_program);
 
-    f32_3t offs = { .x = (f32)sin(glfwGetTime() * 2.0f) * 3.0f, .y = 0.0f, .z = 0.0f };
-    //mult(self->mat4x4, offs);
+    f32_3t offs = { 
+        .x = (f32)cos(glfwGetTime() * 2.0f) * .1f,
+        .y = (f32)sin(glfwGetTime() * 2.0f) * .1f,
+        .z = 0.0f
+    };
+    mult(self->mat4x4, offs);
 
-    self->shape.hull.data[0].y = (i64)(offs.x * 200);
+    //self->shape.hull.data[0].x = (i32)(offs.x * 100);
+    //self->shape.hull.data[0].y = (i32)(offs.y * 100);
 
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        self->shape.hull.len * sizeof(*self->shape.hull.data),
-        self->shape.hull.data,
-        GL_STATIC_DRAW);
+    //glBufferData(
+    //    GL_ARRAY_BUFFER,
+    //    self->shape.hull.len * sizeof(*self->shape.hull.data),
+    //    self->shape.hull.data,
+    //    GL_STATIC_DRAW);
 
     // TODO: uncomment to use camera
     //glUniformMatrix4fv(self->shader->gl_camera, 1, GL_FALSE, camera);
 
     glUniformMatrix4fv(self->gl_mat4_id, 1, GL_FALSE, self->mat4x4);
 
-    f32 col[4] = { offs.x, offs.y, .5f, 1.0f };
+    f32 col[4] = { offs.x, 0.0f, .5f, 1.0f };
     glUniform4fv(self->gl_color3f, 1, col);
 
     // begin vertex attribute : position

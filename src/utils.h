@@ -10,4 +10,4 @@
 // skip: how many bytes to skip before setting another one
 void memset_skip(void* ptr, u8 value, size_t num, size_t skip);
 
-#endif __UTILS_H__
+#endif // __UTILS_H__

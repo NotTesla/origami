@@ -3,13 +3,13 @@
 #include "tuple_structs.h"
 #include "file_utils.h"
 #include "glad/glad.h"
+#include "mesh.h"
+
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-
-#include "mesh.h"
 
 // prints an error and error code from glfw
 // error: the error code
@@ -106,6 +106,8 @@ void device_init(struct App* app, const char* title) {
     /* Initialize the library */
     if (!glfwInit())
         exit(-1);
+
+    glfwWindowHint(GLFW_SAMPLES, 12);
     
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(1024, 1024, title, NULL, NULL);
@@ -131,10 +133,10 @@ void device_init(struct App* app, const char* title) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_POLYGON_MODE);
 
     i32_2t square[4] = {
-        { .x =-200, .y =-200 },
-        { .x =-200, .y = 200 },
-        { .x = 200, .y =-200 },
-        { .x = 200, .y = 200 }
+        { .x =-50, .y =-50 },
+        { .x =-50, .y = 50 },
+        { .x = 50, .y = 50 },
+        { .x = 50, .y =-50 }
     };
 
     m = mesh_with_vertices(square, 4);
@@ -230,21 +232,5 @@ void device_set_vsync(struct Device* self, Vsync state) {
 }
 
 void device_set_anti_aliasing(struct Device* self, AntiAliasing aliasing) {
-    switch (aliasing) {
-    case NONE:
-        glDisable(GL_MULTISAMPLE_ARB);
-        break;
-    case MSAA_X2:
-    case MSAA_X4:
-    case MSAA_X8:
-    case MSAA_X12:
-        glGetIntegerv(GL_SAMPLES, &((GLint)aliasing));
-        if (aliasing)
-            printf("Context reports MSAA is available with %i samples\n", aliasing);
-        else
-            printf("Context reports MSAA is unavailable\n");
 
-        glEnable(GL_MULTISAMPLE_ARB);
-        break;
-    }
 }

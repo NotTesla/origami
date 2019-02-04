@@ -48,7 +48,7 @@ void app_on_file_dropped(struct App* self, const char* filename, const char* ext
 }
 
 void app_on_key_event(struct App* self, EventState state, KeyData key) {
-    printf("key event\n");
+    
 }
 
 void app_on_touch_event(struct App* self, EventState state, f64_2t pos) {

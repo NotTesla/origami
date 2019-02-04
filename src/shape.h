@@ -22,7 +22,7 @@ struct Shape {
     struct arraylist_u32_3t indices;
 };
 
-struct Shape shape_init_basic(i32_2t* hull, size_t h_len, u32_3t* tris, size_t t_len);
+struct Shape shape_init_basic(const i32_2t* hull, size_t h_len, const u32_3t* tris, size_t t_len);
 
 // copy a given shape and return the copy
 struct Shape shape_copy(struct Shape* cp);
