@@ -3,8 +3,8 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("origami")
-project ("origami_debug")
+project ("release")
+project ("debug")
 
 # Include sub-projects.
-add_subdirectory ("src")
+add_subdirectory ("origami")

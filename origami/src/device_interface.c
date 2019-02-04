@@ -58,13 +58,11 @@ static void on_cursor_enter(GLFWwindow* window, i32 entered) {
     }
 }
 
-/* TODO: update documentation style of this function
-*@param[in] button The[mouse button](@ref buttons) that was pressed or
-*released.
-*  @param[in] action One of `GLFW_PRESS` or `GLFW_RELEASE`.
-*  @param[in] mods Bit field describing which[modifier keys](@ref mods) were
-*  held down.
-*/
+// notifies the app when the mouse click state changes
+// window: the active glfw window
+// button: the mouse button that was pressed
+// action: one of `GLFW_PRESS` or `GLFW_RELEASE`
+// mods: bit flags of modifier keys (shift, ctrl, etc)
 static void on_mouse_button(GLFWwindow* window, i32 button, i32 action, i32 mods) {
     // cache cursor instead?
     f64 x, y;
