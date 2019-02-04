@@ -20,11 +20,13 @@ struct Mesh {
     u32 gl_vbuffer;
     u32 gl_ibuffer;
     u32 gl_varray;
+    u32 gl_tex_buffer;
 
     // TODO: move this to a separate shader class
     u32 gl_program;
     u32 gl_mat4_id;
     u32 gl_color3f;
+    u32 gl_texture;
     u32 gl_camera;
 
     f32 mat4x4[16];

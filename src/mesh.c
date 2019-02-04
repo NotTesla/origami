@@ -5,15 +5,17 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "utils.h"
+
 const char* fragment =
 "#version 450 core\n"
 
-"varying vec4 _albedo;\n"
+"uniform vec4 albedo;\n"
+"uniform sampler2D image;\n"
 "varying vec2 _uv;\n"
 
 "void main(void) {\n"
-"    //gl_FragColor = _albedo;\n"
-"   gl_FragColor.rgba = vec4(_uv.x, 0.0, 0.0, 1.0);\n"
+"   gl_FragColor = albedo.rgba * texture(image, _uv).rgba;\n"
 "}";
 
 const char* vertex =
@@ -22,17 +24,14 @@ const char* vertex =
 
 "uniform mat4 camera;\n"
 "uniform mat4 transform;\n"
-"uniform vec4 albedo;\n"
-
 "varying vec2 _uv;\n"
-"varying vec4 _albedo;\n"
+
 "void main(void) {\n"
 
-"    vec2 adjusted_pos = position * 0.01;\n"
-"    gl_Position = transform * vec4(adjusted_pos.xy, 0, 1.0);\n"
+"   vec2 vertex = position * 0.001953125;\n"
+"   gl_Position = transform * vec4(vertex.xy, 0, 1.0);\n"
 
-"    _uv = adjusted_pos.xy;\n"
-"    _albedo = albedo;\n"
+"   _uv = vertex.xy;\n"
 "}";
 
 GLuint compile_shader(GLenum type, const char* src) {
@@ -119,9 +118,9 @@ void create_vertex_buffer(struct Mesh* self) {
 }
 
 static const f32 mat[16] = {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
-    0.0f, 0.0f, 1.0f, 0.0f,
+    0.5f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.5f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.5f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
@@ -131,7 +130,7 @@ void mult(f32 mat[16], f32_3t m) {
     mat[14] = m.z;
     mat[15] = 1.0f;
 }
-
+u8 tex[8*8*4];
 struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
     u32_3t tris[2] = {
         {.x=0, .y=1, .z=3},
@@ -149,6 +148,20 @@ struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
     mesh.gl_color3f = glGetUniformLocation(mesh.gl_program, "albedo");
 
     memcpy(mesh.mat4x4, mat, 16 * sizeof(f32));
+
+    const i32 dimens = 8 * 8;
+    memset_skip(tex + 3, 255, dimens, 4); // set alpha
+    memset_skip(tex + 1, 160, dimens, 3); // set green
+    memset_skip(tex + 2, 255, dimens, 4); // set blue
+    memset_skip(tex + 0, 0,  dimens / 2, 6); // set red
+    
+    mesh.gl_texture = glGetUniformLocation(mesh.gl_program, "texture");
+
+    glGenTextures(1, &mesh.gl_tex_buffer);
+    glBindTexture(GL_TEXTURE_2D, mesh.gl_tex_buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     return mesh;
 }
@@ -184,10 +197,13 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     // TODO: uncomment to use camera
     //glUniformMatrix4fv(self->shader->gl_camera, 1, GL_FALSE, camera);
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, self->gl_tex_buffer);
+    glUniform1i(self->gl_texture, 0);
+
     glUniformMatrix4fv(self->gl_mat4_id, 1, GL_FALSE, self->mat4x4);
 
-    f32 col[4] = { offs.x, 0.0f, .5f, 1.0f };
-    glUniform4fv(self->gl_color3f, 1, col);
+    glUniform4fv(self->gl_color3f, 1, (f32[4]){ 1.0f, 1.0f, 1.0f, 1.0f });
 
     // begin vertex attribute : position
     glEnableVertexAttribArray(0);

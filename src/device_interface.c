@@ -133,10 +133,10 @@ void device_init(struct App* app, const char* title) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_POLYGON_MODE);
 
     i32_2t square[4] = {
-        { .x = 0, .y = 0 },
-        { .x = 0, .y = 100 },
-        { .x = 100, .y = 100 },
-        { .x = 100, .y = 0 }
+        { .x = 0,   .y = 0   },
+        { .x = 0,   .y = 512 },
+        { .x = 512, .y = 512 },
+        { .x = 512, .y = 0   }
     };
 
     m = mesh_with_vertices(square, 4);
