@@ -14,8 +14,8 @@ FILE(GLOB ORIGAMI *.c common/*.c)
 # set(ORIGAMI "app.c" "device_interface.c" "file_utils.c" "main.c" "tuple_interface.c" "utils.c")
 # set(SHADERS "${RES_PATH}/shaders/default.vsh" "${RES_PATH}/shaders/default.fsh")
 
-find_library(GLFW_LIB libglfw3 HINTS "${GLFW_PATH}/libs")
-link_directories("${GLFW_PATH}/libs")
+find_library(GLFW_LIB libglfw3 HINTS "${DEPS}/libs")
+link_directories("${DEPS}/libs")
 
 # Add source to this project's executable.
 add_executable (origami WIN32 ${ORIGAMI} "${GLFW_PATH}/include/GLFW/glfw3.h" "${DEPS}/glad.c")

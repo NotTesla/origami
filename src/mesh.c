@@ -7,28 +7,32 @@
 
 const char* fragment =
 "#version 450 core\n"
-"varying vec4 vs_color;\n"
-"varying vec2 uv;\n"
+
+"varying vec4 _albedo;\n"
+"varying vec2 _uv;\n"
+
 "void main(void) {\n"
-"    //gl_FragColor = vs_color;\n"
-"   gl_FragColor.rgba = vec4(uv.x, uv.y, .5, 1.0);\n"
+"    //gl_FragColor = _albedo;\n"
+"   gl_FragColor.rgba = vec4(_uv.x, 0.0, 0.0, 1.0);\n"
 "}";
 
 const char* vertex =
 "#version 450 core\n"
 "layout(location = 0) in highp vec2 position;\n"
+
 "uniform mat4 camera;\n"
 "uniform mat4 transform;\n"
-"uniform vec4 color;\n"
-"varying vec2 uv;\n"
-"varying vec4 vs_color;\n"
+"uniform vec4 albedo;\n"
+
+"varying vec2 _uv;\n"
+"varying vec4 _albedo;\n"
 "void main(void) {\n"
-"    mat4 scale = mat4(0.0);\n"
-"    scale[0][0] = scale[1][1] = scale[2][2] = 0.005;\n"
-"    scale[3][3] = 1.0;\n"
-"    gl_Position = transform * scale * vec4(position, 0.0, 1.0);\n"
-"    uv = position;\n"
-"    vs_color = color;\n"
+
+"    vec2 adjusted_pos = position * 0.01;\n"
+"    gl_Position = transform * vec4(adjusted_pos.xy, 0, 1.0);\n"
+
+"    _uv = adjusted_pos.xy;\n"
+"    _albedo = albedo;\n"
 "}";
 
 GLuint compile_shader(GLenum type, const char* src) {
@@ -142,7 +146,7 @@ struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
 
     mesh.gl_camera = glGetUniformLocation(mesh.gl_program, "camera");
     mesh.gl_mat4_id = glGetUniformLocation(mesh.gl_program, "transform");
-    mesh.gl_color3f = glGetUniformLocation(mesh.gl_program, "color");
+    mesh.gl_color3f = glGetUniformLocation(mesh.gl_program, "albedo");
 
     memcpy(mesh.mat4x4, mat, 16 * sizeof(f32));
 

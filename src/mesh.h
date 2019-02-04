@@ -33,7 +33,7 @@ struct Mesh {
 
 // initialize a mesh with a given set of vertices
 // vertices - the vertex array
-// len      j- the length of the vertex array
+// len      - the length of the vertex array
 struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len);
 
 // frees a mesh heap allocated resources
