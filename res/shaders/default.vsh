@@ -1,12 +1,14 @@
 #version 450 core
+layout(location = 0) in highp vec2 position;
 
-layout(location = 0) in vec4 position;
-layout(location = 1) in vec4 color;
-out vec4 vs_color;
-layout(location = 20) uniform mat4 modelView;
+uniform mat4 camera;
+uniform mat4 transform;
+varying vec2 _uv;
 
-void main(void)
-{
-    gl_Position = modelView * position;
-    vs_color = color;
+void main(void) {
+
+    vec2 vertex = position * 0.001953125;
+    gl_Position = transform * vec4(vertex.xy, 0, 1.0);
+
+    _uv = vertex.xy;
 }

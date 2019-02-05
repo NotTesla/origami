@@ -2,7 +2,7 @@
 #define __DEVICE_STRUCTS_H__
 
 #include "rusty_ints.h"
-#include "tuple_structs.h"
+#include "basic_tuples.h"
 
 typedef enum AntiAliasing {
     NONE = 0,
@@ -37,17 +37,17 @@ typedef enum PixelDepth {
 typedef struct Bitmap {
     u8* pixels;
     PixelDepth pixel_depth;
-    u16_2t size;
+    struct u16_2t size;
 } Bitmap;
 
 typedef struct Cursor {
     Bitmap* bitmap;
-    u16_2t hotspot;
+    struct u16_2t hotspot;
 } Cursor;
 
 typedef struct Vertex {
-    f32_4t position;
-    f32_4t color;
+    struct f32_4t position;
+    struct f32_4t color;
 } Vertex;
 
 #endif // __DEVICE_STRUCTS_H__

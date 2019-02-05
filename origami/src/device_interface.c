@@ -1,6 +1,5 @@
 #include "device_interface.h"
 
-#include "tuple_structs.h"
 #include "file_utils.h"
 #include "glad/glad.h"
 #include "mesh.h"
@@ -23,8 +22,10 @@ static void error_callback(i32 error, const char* description) {
 // x: the x position of the cursor
 // y: the y position of the cursor
 static void on_cursor_move(GLFWwindow* window, f64 x, f64 y) {
-    f64_2t pos = { .x = x,.y = y };
-    app_on_touch_event(((struct App*)glfwGetWindowUserPointer(window)), TICK, pos);
+    app_on_touch_event(
+        ((struct App*)glfwGetWindowUserPointer(window)),
+        TICK,
+        (struct f64_2t){ .x = x,.y = y });
 }
 
 // notifies the app when a key state changes
@@ -34,8 +35,10 @@ static void on_cursor_move(GLFWwindow* window, f64 x, f64 y) {
 // action: `GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`.
 // mods: Bit field describing which[modifier keys](@ref mods) were
 static void on_key_click(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods) {
-    KeyData data = { .keycode = key };
-    app_on_key_event((struct App*)glfwGetWindowUserPointer(window), (EventState)action, data);
+    app_on_key_event(
+        (struct App*)glfwGetWindowUserPointer(window),
+        (EventState)action,
+        (KeyData){ .keycode = key });
 }
 
 // TODO: unfinished
@@ -53,8 +56,10 @@ static void on_char_click(GLFWwindow* window, u32 utf_32) {
 // entered: the enter state of the cursor
 static void on_cursor_enter(GLFWwindow* window, i32 entered) {
     if (!entered) {
-        f64_2t pos = { .x = 0,.y = 0 };
-        app_on_touch_event((struct App*)glfwGetWindowUserPointer(window), CANCEL, pos);
+        app_on_touch_event(
+            (struct App*)glfwGetWindowUserPointer(window),
+            CANCEL,
+            (struct f64_2t){ .x = 0,.y = 0 });
     }
 }
 
@@ -67,9 +72,11 @@ static void on_mouse_button(GLFWwindow* window, i32 button, i32 action, i32 mods
     // cache cursor instead?
     f64 x, y;
     glfwGetCursorPos(window, &x, &y);
-    f64_2t pos = { .x = x,.y = y };
 
-    app_on_touch_event((struct App*)glfwGetWindowUserPointer(window), (EventState)action, pos);
+    app_on_touch_event(
+        (struct App*)glfwGetWindowUserPointer(window),
+        (EventState)action,
+        (struct f64_2t){ .x = x,.y = y });
 }
 
 // notifies the app when a file is droped onto the window
@@ -87,8 +94,9 @@ static void on_file_drop(GLFWwindow* window, i32 count, const char** files) {
 // width: the width in pixels of the window
 // height: the height in pixels of the window
 static void on_window_resize(GLFWwindow* window, i32 width, i32 height) {
-    u32_2t size = { .x = width,.y = height };
-    app_on_window_resized((struct App*)glfwGetWindowUserPointer(window), size);
+    app_on_window_resized(
+        (struct App*)glfwGetWindowUserPointer(window),
+        (struct u32_2t){ .x = width,.y = height });
 }
 
 // TODO: temporary, used for testing purposes
@@ -130,7 +138,7 @@ void device_init(struct App* app, const char* title) {
     glfwSetWindowSizeCallback(window, on_window_resize);
     glPolygonMode(GL_FRONT_AND_BACK, GL_POLYGON_MODE);
 
-    i32_2t square[4] = {
+    vert square[4] = {
         { .x = 0,   .y = 0   },
         { .x = 0,   .y = 512 },
         { .x = 512, .y = 512 },
@@ -149,22 +157,18 @@ void device_init(struct App* app, const char* title) {
 
 i32 device_run(struct Device* self) {
 
-    // TODO: use matrix.h -> clear
-    f32 camera[4][4] = {
-        { 1.0f, 0.0f, 0.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f, 0.0f },
-        { 0.0f, 0.0f, 1.0f, 0.0f },
-        { 0.0f, 0.0f, 0.0f, 1.0f },
-    };
-
+    f32 last_frame = 0.0f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose((GLFWwindow*)self->_glfw)) {
         //g_vertex_buffer_data[7] = (sin(glfwGetTime()) + 1) / 2.0f + .5f;
+        
+        self->dt = glfwGetTime() - last_frame;
+        last_frame = glfwGetTime();
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        mesh_draw(&m, camera);
+        mesh_draw(&m, self->camera);
         
         /* Swap front and back buffers */
         glfwSwapBuffers((GLFWwindow*)self->_glfw);
@@ -177,7 +181,7 @@ i32 device_run(struct Device* self) {
     return 0;
 }
 
-void device_set_clear_color(struct Device* self, f32_3t rgb) {
+void device_set_clear_color(struct Device* self, struct f32_3t rgb) {
     glClearColor(rgb.x, rgb.y, rgb.z, 1.0f);
 }
 

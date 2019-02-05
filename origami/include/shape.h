@@ -2,27 +2,29 @@
 #define __SHAPE_H__
 
 #include "rusty_ints.h"
-#include "tuple_structs.h"
+#include "basic_tuples.h"
 
 #include <stdbool.h>
 
-#define TYPE u32_3t
+typedef struct u32_3t tri;
+#define TYPE tri
 #include "arraylist_schema.h"
 
-#define TYPE i32_2t
+typedef struct i32_2t vert;
+#define TYPE vert
 #include "arraylist_schema.h"
 
-typedef struct arraylist_i32_2t Vertices;
+typedef struct arraylist_vert Vertices;
 #define TYPE Vertices
 #include "arrayfat_schema.h"
 
 struct Shape {
-    struct arraylist_i32_2t hull;
+    struct arraylist_vert hull;
     struct array_Vertices holes;
-    struct arraylist_u32_3t indices;
+    struct arraylist_tri indices;
 };
 
-struct Shape shape_init_basic(const i32_2t* hull, size_t h_len, const u32_3t* tris, size_t t_len);
+struct Shape shape_init_basic(const vert* hull, size_t h_len, const tri* tris, size_t t_len);
 
 // copy a given shape and return the copy
 struct Shape shape_copy(struct Shape* cp);

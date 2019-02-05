@@ -1,7 +1,7 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
-#include "tuple_structs.h"
+#include "basic_tuples.h"
 #include "shape.h"
 
 struct Material {
@@ -36,7 +36,7 @@ struct Mesh {
 // initialize a mesh with a given set of vertices
 // vertices - the vertex array
 // len      - the length of the vertex array
-struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len);
+struct Mesh mesh_with_vertices(const struct i32_2t* vertices, size_t len);
 
 // frees a mesh heap allocated resources
 void mesh_free(struct Mesh* mesh);

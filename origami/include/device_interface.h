@@ -3,13 +3,13 @@
 
 #include "app.h"
 #include "device_structs.h"
-#include "tuple_structs.h"
+#include "basic_tuples.h"
 
 void device_init(struct App* app, const char* title);
 
 i32 device_run(struct Device* self);
 
-void device_set_clear_color(struct Device* self, f32_3t rgb);
+void device_set_clear_color(struct Device* self, struct f32_3t rgb);
 
 void device_set_cursor_mode(struct Device* self, CursorMode mode);
 

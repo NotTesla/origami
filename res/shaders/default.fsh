@@ -1,9 +1,9 @@
 #version 450 core
 
-in vec4 vs_color;
-out vec4 color;
+uniform vec4 albedo;
+uniform sampler2D image;
+varying vec2 _uv;
 
-void main(void)
-{
-	color = vs_color;
+void main(void) {
+    gl_FragColor = albedo.rgba * texture(image, _uv).rgba;
 }

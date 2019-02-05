@@ -1,0 +1,48 @@
+#ifndef __BASIC_TUPLES_H__
+#define __BASIC_TUPLES_H__
+
+#include "rusty_ints.h"
+#include "tuple_schema.h"
+// 2-tuple
+DEF_2TUPLE(u8);
+DEF_2TUPLE(u16);
+DEF_2TUPLE(u32);
+DEF_2TUPLE(u64);
+
+DEF_2TUPLE(i8);
+DEF_2TUPLE(i16);
+DEF_2TUPLE(i32);
+DEF_2TUPLE(i64);
+
+DEF_2TUPLE(f32);
+DEF_2TUPLE(f64);
+
+// 3-tuple
+DEF_3TUPLE(u8);
+DEF_3TUPLE(u16);
+DEF_3TUPLE(u32);
+DEF_3TUPLE(u64);
+
+DEF_3TUPLE(i8);
+DEF_3TUPLE(i16);
+DEF_3TUPLE(i32);
+DEF_3TUPLE(i64);
+
+DEF_3TUPLE(f32);
+DEF_3TUPLE(f64);
+
+// 4-tuple
+DEF_4TUPLE(u8);
+DEF_4TUPLE(u16);
+DEF_4TUPLE(u32);
+DEF_4TUPLE(u64);
+
+DEF_4TUPLE(i8);
+DEF_4TUPLE(i16);
+DEF_4TUPLE(i32);
+DEF_4TUPLE(i64);
+
+DEF_4TUPLE(f32);
+DEF_4TUPLE(f64);
+
+#endif // __BASIC_TUPLES_H__

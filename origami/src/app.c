@@ -1,7 +1,6 @@
 #include "app.h"
 #include "device_structs.h"
 #include "device_interface.h"
-#include "tuple_interface.h"
 #include "utils.h"
 
 #include <stdlib.h>
@@ -17,7 +16,7 @@ void app_on_device_init(struct App* self) {
     };
     memcpy(self->device.camera, identity, 16 * sizeof(f32));
 
-    device_set_clear_color(&self->device, (f32_3t){.x=.95f,.y=.95f,.z=1.0f});
+    device_set_clear_color(&self->device, (struct f32_3t){.x=.95f,.y=.95f,.z=1.0f});
     device_set_vsync(&self->device, ON);
 
     const u16 width = 20;
@@ -34,11 +33,11 @@ void app_on_device_init(struct App* self) {
     Bitmap bitmap;
     bitmap.pixels = pixels;
     bitmap.pixel_depth = RGBA;
-    bitmap.size = u16_2t_new(width, height);
+    bitmap.size = (struct u16_2t){.x = width, .y = height};
 
     Cursor cursor;
     cursor.bitmap = &bitmap;
-    cursor.hotspot = u16_2t_new(0, 0);
+    cursor.hotspot = (struct u16_2t){.x = 0, .y = 0};
 
     device_set_cursor(&self->device, &cursor);
 }
@@ -48,13 +47,27 @@ void app_on_file_dropped(struct App* self, const char* filename, const char* ext
 }
 
 void app_on_key_event(struct App* self, EventState state, KeyData key) {
-    
+    f32 cam_speed = self->device.dt * 1.0f;
+    switch (key.keycode) {
+        case 87: // w
+            self->device.camera[3][1] -= cam_speed;
+            break;
+        case 68: // d
+            self->device.camera[3][0] -= cam_speed;
+            break;
+        case 83: // s
+            self->device.camera[3][1] += cam_speed;
+            break;
+        case 65: // a
+            self->device.camera[3][0] += cam_speed;
+            break;
+    }
 }
 
-void app_on_touch_event(struct App* self, EventState state, f64_2t pos) {
+void app_on_touch_event(struct App* self, EventState state, struct f64_2t pos) {
     //printf("touch event\n");
 }
 
-void app_on_window_resized(struct App* self, u32_2t size) {
+void app_on_window_resized(struct App* self, struct u32_2t size) {
     printf("Window Resized: (%u, %u)\n", size.x, size.y);
 }

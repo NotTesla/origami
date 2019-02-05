@@ -29,7 +29,7 @@ const char* vertex =
 "void main(void) {\n"
 
 "   vec2 vertex = position * 0.001953125;\n"
-"   gl_Position = transform * vec4(vertex.xy, 0, 1.0);\n"
+"   gl_Position = camera * transform * vec4(vertex.xy, 0, 1.0);\n"
 
 "   _uv = vertex.xy;\n"
 "}";
@@ -124,15 +124,18 @@ static const f32 mat[16] = {
     0.0f, 0.0f, 0.0f, 1.0f
 };
 
-void mult(f32 mat[16], f32_3t m) {
+void mult(f32 mat[16], struct f32_3t m) {
     mat[12] = m.x;
     mat[13] = m.y;
     mat[14] = m.z;
     mat[15] = 1.0f;
 }
-u8 tex[8*8*4];
-struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
-    u32_3t tris[2] = {
+
+#define WIDTH 16
+#define HEIGHT 16
+u8 tex[WIDTH * HEIGHT *4];
+struct Mesh mesh_with_vertices(const struct i32_2t* vertices, size_t len) {
+    struct u32_3t tris[2] = {
         {.x=0, .y=1, .z=3},
         {.x=1, .y=3, .z=2}
     };
@@ -149,7 +152,7 @@ struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
 
     memcpy(mesh.mat4x4, mat, 16 * sizeof(f32));
 
-    const i32 dimens = 8 * 8;
+    const i32 dimens = WIDTH * HEIGHT;
     memset_skip(tex + 3, 255, dimens, 4); // set alpha
     memset_skip(tex + 1, 160, dimens, 3); // set green
     memset_skip(tex + 2, 255, dimens, 4); // set blue
@@ -159,7 +162,7 @@ struct Mesh mesh_with_vertices(const i32_2t* vertices, size_t len) {
 
     glGenTextures(1, &mesh.gl_tex_buffer);
     glBindTexture(GL_TEXTURE_2D, mesh.gl_tex_buffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -178,12 +181,12 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     // if performance becomes an issue here
     glUseProgram(self->gl_program);
 
-    f32_3t offs = { 
+    struct f32_3t offs = { 
         .x = (f32)cos(glfwGetTime() * 2.0f) * .1f,
         .y = (f32)sin(glfwGetTime() * 2.0f) * .1f,
         .z = 0.0f
     };
-    mult(self->mat4x4, offs);
+    // mult(self->mat4x4, offs);
 
     //self->shape.hull.data[0].x = (i32)(offs.x * 100);
     //self->shape.hull.data[0].y = (i32)(offs.y * 100);
@@ -194,14 +197,12 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     //    self->shape.hull.data,
     //    GL_STATIC_DRAW);
 
-    // TODO: uncomment to use camera
-    //glUniformMatrix4fv(self->shader->gl_camera, 1, GL_FALSE, camera);
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, self->gl_tex_buffer);
     glUniform1i(self->gl_texture, 0);
 
     glUniformMatrix4fv(self->gl_mat4_id, 1, GL_FALSE, self->mat4x4);
+    glUniformMatrix4fv(self->gl_camera, 1, GL_FALSE, &camera[0][0]);
 
     glUniform4fv(self->gl_color3f, 1, (f32[4]){ 1.0f, 1.0f, 1.0f, 1.0f });
 
