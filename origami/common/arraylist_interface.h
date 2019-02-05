@@ -60,6 +60,21 @@ TYPE REMOVE_AT(LIST)(struct LIST* self, size_t index) {
     return item;
 }
 
+#define ERASE(x) APPEND(x, _erase)
+// Removes a given element from the arraylist
+// shifts all elements after it back to replace it
+// self: the list to act on
+// element: the element to remove from the arraylist
+// TODO: add a flag to remove duplicate entries as well
+// TODO: a fn* to check equality might be better...
+TYPE ERASE(LIST)(struct LIST* self, TYPE element) {
+    for (size_t i = 0; self->len; ++i) {
+        if (memcmp(&self->data[i], &element, sizeof(element)) == 0) {
+            return REMOVE_AT(LIST)(self, i);
+        }
+    }
+}
+
 #define WITH_CAPACITY(x) APPEND(x, _with_capacity)
 // Initialize an arraylist with a given capacity
 // capacity: the capacity to initialize the list with

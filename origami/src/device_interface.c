@@ -1,5 +1,6 @@
 #include "device_interface.h"
 
+#include "input_handler.h"
 #include "file_utils.h"
 #include "glad/glad.h"
 #include "mesh.h"
@@ -35,10 +36,9 @@ static void on_cursor_move(GLFWwindow* window, f64 x, f64 y) {
 // action: `GLFW_PRESS`, `GLFW_RELEASE` or `GLFW_REPEAT`.
 // mods: Bit field describing which[modifier keys](@ref mods) were
 static void on_key_click(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods) {
-    app_on_key_event(
-        (struct App*)glfwGetWindowUserPointer(window),
-        (EventState)action,
-        (KeyData){ .keycode = key });
+    input_on_key_state_change(
+        ((struct App*)glfwGetWindowUserPointer(window))->device.input,
+        (enum EventState)action, (struct KeyData){.keycode=key});
 }
 
 // TODO: unfinished
@@ -75,7 +75,7 @@ static void on_mouse_button(GLFWwindow* window, i32 button, i32 action, i32 mods
 
     app_on_touch_event(
         (struct App*)glfwGetWindowUserPointer(window),
-        (EventState)action,
+        (enum EventState)action,
         (struct f64_2t){ .x = x,.y = y });
 }
 
@@ -114,7 +114,6 @@ void device_init(struct App* app, const char* title) {
         exit(-1);
 
     glfwWindowHint(GLFW_SAMPLES, 12);
-    
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(1024, 1024, title, NULL, NULL);
 
@@ -138,6 +137,20 @@ void device_init(struct App* app, const char* title) {
     glfwSetWindowSizeCallback(window, on_window_resize);
     glPolygonMode(GL_FRONT_AND_BACK, GL_POLYGON_MODE);
 
+    i32 ico[16] = {
+        0,0x00FFFFFF,0xFFFF00FF,0,
+        0xFF00FFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+        0,0xFFFFFFFF,0xFFFF00FF,0,
+        0,0xFFFFFFFF,0xFF00FFFF,0
+    };
+
+    struct GLFWimage glfw_icon;
+    glfw_icon.width = 4;
+    glfw_icon.height = 4;
+    glfw_icon.pixels = (u8*)ico;
+
+    glfwSetWindowIcon(window, 1, &glfw_icon);
+
     vert square[4] = {
         { .x = 0,   .y = 0   },
         { .x = 0,   .y = 512 },
@@ -151,6 +164,10 @@ void device_init(struct App* app, const char* title) {
     glDepthFunc(GL_LESS);
 
     app->device._glfw = window;
+    
+    app->device.input = malloc(sizeof(struct Input));
+    struct Input in = input_init(app);
+    memcpy(app->device.input, &in, sizeof(struct Input));
 
     app_on_device_init(app);
 }
@@ -175,6 +192,8 @@ i32 device_run(struct Device* self) {
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        input_send_key_events(self->input);
     }
 
     glfwTerminate();

@@ -46,7 +46,7 @@ void app_on_file_dropped(struct App* self, const char* filename, const char* ext
     printf("file dropped with name: %s, extension: %s\n", filename, extension);
 }
 
-void app_on_key_event(struct App* self, EventState state, KeyData key) {
+void app_on_key_event(struct App* self, enum EventState state, struct KeyData key) {
     f32 cam_speed = self->device.dt * 1.0f;
     switch (key.keycode) {
         case 87: // w
@@ -64,7 +64,7 @@ void app_on_key_event(struct App* self, EventState state, KeyData key) {
     }
 }
 
-void app_on_touch_event(struct App* self, EventState state, struct f64_2t pos) {
+void app_on_touch_event(struct App* self, enum EventState state, struct f64_2t pos) {
     //printf("touch event\n");
 }
 
