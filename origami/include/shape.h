@@ -3,6 +3,7 @@
 
 #include "rusty_ints.h"
 #include "basic_tuples.h"
+#include "origami.h"
 
 #include <stdbool.h>
 
@@ -10,16 +11,11 @@ typedef struct u32_3t tri;
 #define TYPE tri
 #include "arraylist_schema.h"
 
-typedef struct i32_2t vert;
-#define TYPE vert
-#include "arraylist_schema.h"
-
-typedef struct arraylist_vert Vertices;
 #define TYPE Vertices
 #include "arrayfat_schema.h"
 
 struct Shape {
-    struct arraylist_vert hull;
+    Vertices hull;
     struct array_Vertices holes;
     struct arraylist_tri indices;
 };

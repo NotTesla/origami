@@ -2,12 +2,16 @@
 
 #include <stdlib.h>
 
+#include "clipper_wrapper.hpp"
+
 //#include "clipper.h"
 
-#define TYPE vert
+#define DATA_DEF vert
+#define LIST_DEF Vertices
+#define LIST_ALIAS vertices
 #include "arraylist_interface.h"
 
-#define TYPE tri
+#define DATA_DEF tri
 #include "arraylist_interface.h"
 
 #define TYPE Vertices
@@ -18,7 +22,7 @@ struct Shape shape_init_basic(
     const tri* tris, size_t t_len) {
 
     struct Shape self;
-    self.hull = arraylist_vert_with_array(hull, h_len);
+    self.hull = vertices_with_array(hull, h_len);
     self.indices = arraylist_tri_with_array(tris, t_len);
 
     self.holes.data = NULL;
@@ -29,14 +33,14 @@ struct Shape shape_init_basic(
 struct Shape shape_copy(struct Shape* cp) {
     struct Shape self;
     // copy the shape hull
-    self.hull = arraylist_vert_with_array(cp->hull.data, cp->hull.len);
+    self.hull = vertices_with_array(cp->hull.data, cp->hull.len);
 
     // copy the shape holes
     self.holes = array_Vertices_with_array(cp->holes.data, cp->holes.len);
 
     for (size_t i = 0; i < self.holes.len; ++i) {
         self.holes.data[i] = 
-            arraylist_vert_with_array(
+            vertices_with_array(
                 cp->holes.data[i].data,
                 cp->holes.data[i].len);
     }
@@ -56,15 +60,18 @@ struct Shape* shape_copy_heap(struct Shape* cp) {
 }
 
 void shape_free(struct Shape* self) {
-    arraylist_vert_free(&self->hull);
+    vertices_free(&self->hull);
 
     for (size_t i = 0; i < self->holes.len; ++i) {
-        arraylist_vert_free(self->holes.data + i);
+        vertices_free(self->holes.data + i);
     }
 }
 
 bool shape_bool_union(struct Shape* self, struct Shape* other) {
+    clipper_push_shape(ptSubject, self->hull);
     // TODO: make clipper calls here
+    
+
     return false;
 }
 

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define TYPE i32
+#define DATA_DEF i32
 #include "arraylist_interface.h"
 
 struct Input input_init(struct App* app) {
