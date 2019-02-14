@@ -11,6 +11,11 @@
 #include <stdbool.h>
 #include <math.h>
 
+#define DATA_DEF struct Mesh
+#define LIST_DEF struct arraylist_Mesh
+#define LIST_ALIAS arraylist_Mesh
+#include "arraylist_interface.h"
+
 // prints an error and error code from glfw
 // error: the error code
 // description: a description of the error
@@ -99,10 +104,6 @@ static void on_window_resize(GLFWwindow* window, i32 width, i32 height) {
         (struct u32_2t){ .x = width,.y = height });
 }
 
-// TODO: temporary, used for testing purposes
-// later, `App::Device` should own an arraylist<struct Mesh*> 
-struct Mesh m;
-
 // initialize the window with a given app and window title
 // 
 void device_init(struct App* app, const char* title) {
@@ -153,12 +154,16 @@ void device_init(struct App* app, const char* title) {
 
     vert square[4] = {
         { .x = 0,   .y = 0   },
-        { .x = 0,   .y = 512 },
-        { .x = 512, .y = 512 },
-        { .x = 512, .y = 0   }
+        { .x = 0,   .y = 1024 },
+        { .x = 1024,.y = 1024 },
+        { .x = 1024,.y = 0   }
     };
-
-    m = mesh_with_vertices(square, 4);
+    vert square_cursor[4] = {
+        { .x = -32,.y = -32},
+        { .x = -32,.y = 32 },
+        { .x = 32, .y = 32 },
+        { .x = 32, .y = -32}
+    };
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -168,6 +173,10 @@ void device_init(struct App* app, const char* title) {
     app->device.input = malloc(sizeof(struct Input));
     struct Input in = input_init(app);
     memcpy(app->device.input, &in, sizeof(struct Input));
+    
+    app->device.meshes = arraylist_Mesh_with_capacity(10);
+    arraylist_Mesh_push(&app->device.meshes, mesh_with_vertices(square, 4));
+    arraylist_Mesh_push(&app->device.meshes, mesh_with_vertices(square_cursor, 4));
 
     app_on_device_init(app);
 }
@@ -185,7 +194,13 @@ i32 device_run(struct Device* self) {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        mesh_draw(&m, self->camera);
+        // for (int i = 0; i < 4; ++i) {
+        //     mesh_
+        // }
+
+        for (int i = 0; i < self->meshes.len; ++i) {
+            mesh_draw(&self->meshes.data[i], self->camera);
+        }
         
         /* Swap front and back buffers */
         glfwSwapBuffers((GLFWwindow*)self->_glfw);

@@ -4,10 +4,16 @@
 #include "input_schema.h"
 #include "input_handler.h"
 #include "basic_tuples.h"
+#include "mesh.h"
+
+#define TYPE struct Mesh
+#define ALIAS Mesh
+#include "arraylist_schema.h"
 
 struct Device {
     f32 camera[4][4];
     struct Input* input;
+    struct arraylist_Mesh meshes;
     // Hide the glfwWindow behind a void* to avoid polluting with glfw and gl functions
     f32 dt;
     void* _glfw;

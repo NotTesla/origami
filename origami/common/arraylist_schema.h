@@ -19,10 +19,14 @@
 #error "arraylist_schema.h was included, but TYPE was undefined"
 #else
 
+#ifndef ALIAS
+#define ALIAS TYPE
+#endif
+
 #include "rusty_ints.h"
 #include "common_macros.h"
 
-struct ARRAY_LIST(TYPE) {
+struct ARRAY_LIST(ALIAS) {
     TYPE* data;
     size_t capacity;
     size_t len;
@@ -30,8 +34,10 @@ struct ARRAY_LIST(TYPE) {
 
 #ifdef INTERFACE
 #undef INTERFACE
+#define DATA_DEF TYPE
 #include "arraylist_interface.h"
 #endif
 
 #undef TYPE
+#undef ALIAS
 #endif

@@ -15,8 +15,7 @@ extern "C" {
         enum CWPolyType polyType,
         Vertices shape) {
 
-        auto cppshape = Path(shape.len);
-        cppshape.assign((IntPoint*)shape.data, (IntPoint*)(shape.data + shape.len));
+        Path cppshape((IntPoint*)shape.data, (IntPoint*)(shape.data + shape.len));
         clipper.AddPath(cppshape, (PolyType)polyType, true);
     }
 

@@ -7,7 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+struct f64_2t last;
 void app_on_device_init(struct App* self) {
+    last = (struct f64_2t){ 0.0f, 0.0f };
     f32 identity[4][4] = {
         { 1.0f, 0.0f, 0.0f, 0.0f },
         { 0.0f, 1.0f, 0.0f, 0.0f },
@@ -61,10 +63,22 @@ void app_on_key_event(struct App* self, enum EventState state, struct KeyData ke
         case 65: // a
             self->device.camera[3][0] += cam_speed;
             break;
+        // case 32: // space
     }
 }
 
 void app_on_touch_event(struct App* self, enum EventState state, struct f64_2t pos) {
+    if (state == TICK) {
+        struct f64_2t delta = { (pos.x - last.x), -(pos.y - last.y) };
+        last = pos;
+        for (int i = 0; i < 4; ++i) {
+            vert v = self->device.meshes.data[1].shape.hull.data[i];
+            v.x += (i32)(delta.x);
+            v.y += (i32)(delta.y);
+            self->device.meshes.data[1].shape.hull.data[i] = v;
+        }
+    }
+
     //printf("touch event\n");
 }
 

@@ -28,7 +28,7 @@ const char* vertex =
 
 "void main(void) {\n"
 
-"   vec2 vertex = position * 0.001953125;\n"
+"   vec2 vertex = position * 0.0009765625;\n"
 "   gl_Position = camera * transform * vec4(vertex.xy, 0, 1.0);\n"
 
 "   _uv = vertex.xy;\n"
@@ -191,6 +191,11 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     //self->shape.hull.data[0].x = (i32)(offs.x * 100);
     //self->shape.hull.data[0].y = (i32)(offs.y * 100);
 
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        self->shape.hull.len * sizeof(*self->shape.hull.data),
+        self->shape.hull.data,
+        GL_STATIC_DRAW);
     //glBufferData(
     //    GL_ARRAY_BUFFER,
     //    self->shape.hull.len * sizeof(*self->shape.hull.data),
