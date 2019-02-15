@@ -51,6 +51,8 @@ void app_on_file_dropped(struct App* self, const char* filename, const char* ext
 void app_on_key_event(struct App* self, enum EventState state, struct KeyData key) {
     f32 cam_speed = self->device.dt * 1.0f;
     switch (key.keycode) {
+
+        // Move camera
         case 87: // w
             self->device.camera[3][1] -= cam_speed;
             break;
@@ -62,6 +64,16 @@ void app_on_key_event(struct App* self, enum EventState state, struct KeyData ke
             break;
         case 65: // a
             self->device.camera[3][0] += cam_speed;
+            break;
+
+        // Zoom in/out
+        case 81: // q
+            self->device.camera[0][0] -= cam_speed;
+            self->device.camera[1][1] -= cam_speed;
+            break;
+        case 69: // e
+            self->device.camera[0][0] += cam_speed;
+            self->device.camera[1][1] += cam_speed;
             break;
         // case 32: // space
     }
@@ -78,8 +90,6 @@ void app_on_touch_event(struct App* self, enum EventState state, struct f64_2t p
             self->device.meshes.data[1].shape.hull.data[i] = v;
         }
     }
-
-    //printf("touch event\n");
 }
 
 void app_on_window_resized(struct App* self, struct u32_2t size) {
