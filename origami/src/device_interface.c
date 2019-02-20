@@ -90,7 +90,10 @@ static void on_mouse_button(GLFWwindow* window, i32 button, i32 action, i32 mods
 // files: a 2d array of the dropped file's names
 static void on_file_drop(GLFWwindow* window, i32 count, const char** files) {
     for (i32 i = 0; i < count; ++i) {
-        app_on_file_dropped((struct App*)glfwGetWindowUserPointer(window), files[i], get_extension(files[i]));
+        app_on_file_dropped(
+            (struct App*)glfwGetWindowUserPointer(window),
+            files[i],
+            futils_get_ext(files[i]));
     }
 }
 
@@ -106,7 +109,7 @@ static void on_window_resize(GLFWwindow* window, i32 width, i32 height) {
 
 // initialize the window with a given app and window title
 // 
-void device_init(struct App* app, const char* title) {
+void device_init(const struct DeviceSettings settings, struct App* app) {
     GLFWwindow* window;
     glfwSetErrorCallback(error_callback);
 
@@ -116,7 +119,12 @@ void device_init(struct App* app, const char* title) {
 
     glfwWindowHint(GLFW_SAMPLES, 12);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1024, 1024, title, NULL, NULL);
+    window = glfwCreateWindow(
+        settings.window_size.x,
+        settings.window_size.y,
+        settings.window_title,
+        NULL,
+        NULL);
 
     if (!window) {
         glfwTerminate();
@@ -170,45 +178,48 @@ void device_init(struct App* app, const char* title) {
 
     app->device._glfw = window;
     
+    app->device.camera = camera_with_perspective(90.0f,
+        settings.window_size.x / settings.window_size.y,
+        .125f, 320.0f);
+
     app->device.input = malloc(sizeof(struct Input));
     struct Input in = input_init(app);
     memcpy(app->device.input, &in, sizeof(struct Input));
     
-    app->device.meshes = arraylist_Mesh_with_capacity(10);
-    arraylist_Mesh_push(&app->device.meshes, mesh_with_vertices(square, 4));
-    arraylist_Mesh_push(&app->device.meshes, mesh_with_vertices(square_cursor, 4));
+    app->meshes = arraylist_Mesh_with_capacity(10);
+    arraylist_Mesh_push(&app->meshes, mesh_with_vertices(square, 4));
+    arraylist_Mesh_push(&app->meshes, mesh_with_vertices(square_cursor, 4));
+
+    device_set_clear_color(&app->device, settings.clear_color);
+    device_set_anti_aliasing(&app->device, settings.anti_aliasing);
+    device_set_vsync(&app->device, settings.vsync_state);
 
     app_on_device_init(app);
 }
 
-i32 device_run(struct Device* self) {
+int device_consume(struct App* self) {
 
     f32 last_frame = 0.0f;
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose((GLFWwindow*)self->_glfw)) {
-        //g_vertex_buffer_data[7] = (sin(glfwGetTime()) + 1) / 2.0f + .5f;
+    while (!glfwWindowShouldClose((GLFWwindow*)self->device._glfw)) {
         
-        self->dt = glfwGetTime() - last_frame;
+        self->device.dt = glfwGetTime() - last_frame;
         last_frame = glfwGetTime();
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        // for (int i = 0; i < 4; ++i) {
-        //     mesh_
-        // }
 
         for (int i = 0; i < self->meshes.len; ++i) {
-            mesh_draw(&self->meshes.data[i], self->camera);
+            mesh_draw(&self->meshes.data[i], &self->device.camera);
         }
         
         /* Swap front and back buffers */
-        glfwSwapBuffers((GLFWwindow*)self->_glfw);
+        glfwSwapBuffers((GLFWwindow*)self->device._glfw);
 
         /* Poll for and process events */
         glfwPollEvents();
 
-        input_send_key_events(self->input);
+        input_send_key_events(self->device.input);
     }
 
     glfwTerminate();
@@ -263,10 +274,10 @@ void device_set_title(struct Device* self, const char* title) {
     glfwSetWindowTitle((GLFWwindow*)self->_glfw, title);
 }
 
-void device_set_vsync(struct Device* self, Vsync state) {
+void device_set_vsync(struct Device* self, enum Vsync state) {
     glfwSwapInterval(state);
 }
 
-void device_set_anti_aliasing(struct Device* self, AntiAliasing aliasing) {
+void device_set_anti_aliasing(struct Device* self, enum AntiAliasing aliasing) {
 
 }

@@ -3,6 +3,7 @@
 
 #include "input_schema.h"
 #include "input_handler.h"
+#include "device_schema.h"
 #include "basic_tuples.h"
 #include "mesh.h"
 
@@ -10,18 +11,17 @@
 #define ALIAS Mesh
 #include "arraylist_schema.h"
 
-struct Device {
-    f32 camera[4][4];
-    struct Input* input;
-    struct arraylist_Mesh meshes;
-    // Hide the glfwWindow behind a void* to avoid polluting with glfw and gl functions
-    f32 dt;
-    void* _glfw;
-};
-
 struct App {
     struct Device device;
+    struct DeviceSettings device_settings;
+    struct arraylist_Mesh meshes;
 };
+
+// initialize an app with arguments
+// 
+struct App app_with_args(const char** argv, size_t argc);
+
+int app_consume(struct App self);
 
 void app_on_device_init(struct App* self);
 

@@ -19,14 +19,14 @@ const char* vertex =
 "#version 450 core\n"
 "layout(location = 0) in highp vec2 position;\n"
 
-"uniform mat4 camera;\n"
-"uniform mat4 transform;\n"
+"uniform mat4 mvp;\n"
+"uniform float zdex;\n"
 "varying vec2 _uv;\n"
 
 "void main(void) {\n"
 
 "   vec2 vertex = position * 0.0009765625;\n"
-"   gl_Position = camera * transform * vec4(vertex.xy, 0, 1.0);\n"
+"   gl_Position = mvp * vec4(vertex.xy, zdex, 1.0);\n"
 
 "   _uv = vertex.xy;\n"
 "}";
@@ -89,10 +89,10 @@ struct Material material_with_shader(const char* shader) {
     struct Material self;
 
     self.gl_program = create_program(fragment, vertex);
-    self.gl_uni_camera = glGetUniformLocation(self.gl_program, "camera");
+    self.gl_uni_mvp = glGetUniformLocation(self.gl_program, "mvp");
+    self.gl_uni_zdex = glGetUniformLocation(self.gl_program, "zdex");
     self.gl_uni_albedo = glGetUniformLocation(self.gl_program, "albedo");
     self.gl_uni_texture = glGetUniformLocation(self.gl_program, "texture");
-    self.gl_uni_transform = glGetUniformLocation(self.gl_program, "transform");
 
     return self;
 }

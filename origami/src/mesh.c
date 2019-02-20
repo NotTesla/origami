@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <cglm/mat4.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -36,13 +37,6 @@ void create_vertex_buffer(struct Mesh* self) {
         GL_STATIC_DRAW);
 }
 
-static const f32 mat[16] = {
-    0.5f, 0.0f, 0.0f, 0.0f,
-    0.0f, 0.5f, 0.0f, 0.0f,
-    0.0f, 0.0f, 0.5f, 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f
-};
-
 void mult(f32 mat[16], struct f32_3t m) {
     mat[12] = m.x;
     mat[13] = m.y;
@@ -63,10 +57,13 @@ struct Mesh mesh_with_vertices(const struct i32_2t* vertices, size_t len) {
     mesh.shape = shape_init_basic(vertices, len, tris, 2);
 
     create_vertex_buffer(&mesh);
+
+    // TODO: I'm surprised this works... material should be alloced onto the heap, no?
     m = material_with_shader("");
     mesh.material = &m;
+    // - - - - - - - -
 
-    memcpy(mesh.mat4x4, mat, 16 * sizeof(f32));
+    glm_mat4_identity(mesh.transform);
 
     const i32 dimens = WIDTH * HEIGHT;
     memset_skip(tex + 3, 255, dimens, 4); // set alpha
@@ -87,7 +84,7 @@ void mesh_free(struct Mesh* mesh) {
     shape_free(&mesh->shape);
 }
 
-void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
+void mesh_draw(struct Mesh* self, struct Camera* camera) {
 
     glUseProgram(self->material->gl_program);
 
@@ -116,8 +113,13 @@ void mesh_draw(struct Mesh* self, f32 camera[4][4]) {
     glBindTexture(GL_TEXTURE_2D, self->gl_tex_buffer);
     glUniform1i(self->material->gl_uni_texture, 0);
 
-    glUniformMatrix4fv(self->material->gl_uni_transform, 1, GL_FALSE, self->mat4x4);
-    glUniformMatrix4fv(self->material->gl_uni_camera, 1, GL_FALSE, &camera[0][0]);
+    mat4 mvp;
+    glm_mat4_mul(camera->view, self->transform, mvp);
+    glm_mat4_mul(camera->projection, mvp, mvp);
+
+    glUniformMatrix4fv(self->material->gl_uni_mvp, 1, GL_FALSE, &mvp[0][0]);
+
+    glUniform1f(self->material->gl_uni_zdex, -1.0f);
 
     glUniform4fv(self->material->gl_uni_albedo, 1, (f32[4]){ 1.0f, 1.0f, 1.0f, 1.0f });
 

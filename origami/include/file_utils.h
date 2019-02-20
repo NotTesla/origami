@@ -11,6 +11,6 @@ size_t futils_get_size(const char* filename);
 free_str futils_dump(const char* filename);
 
 /* get the file extension of a filename, no alloc */
-const char* get_extension(const char* filename);
+const char* futils_get_ext(const char* filename);
 
 #endif // __FILE_UTILS_H__

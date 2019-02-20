@@ -1,27 +1,28 @@
-#ifndef __DEVICE_STRUCTS_H__
-#define __DEVICE_STRUCTS_H__
+#ifndef __DEVICE_SETTINGS_H__
+#define __DEVICE_SETTINGS_H__
 
+#include "camera.h"
 #include "rusty_ints.h"
 #include "basic_tuples.h"
 
-typedef enum AntiAliasing {
+enum AntiAliasing {
     NONE = 0,
     MSAA_X2 = 2,
     MSAA_X4 = 4,
     MSAA_X8 = 8,
     MSAA_X12 = 12,
-} AntiAliasing;
+};
 
-typedef enum WindowMode {
+enum WindowMode {
     FULL_SCREEN = 0x01,
     WINDOWED = 0x02,
     FIXED_WINDOW = 0x04,
-} WindowMode;
+};
 
-typedef enum Vsync {
+enum Vsync {
     OFF = 0x00,
     ON = 0x01,
-} Vsync;
+};
 
 typedef enum CursorMode {
     DEFAULT = 0x01,
@@ -45,9 +46,21 @@ typedef struct Cursor {
     struct u16_2t hotspot;
 } Cursor;
 
-typedef struct Vertex {
-    struct f32_4t position;
-    struct f32_4t color;
-} Vertex;
+struct DeviceSettings {
+    const char* window_title;
+    enum WindowMode window_mode;
+    struct u32_2t window_size;
+    struct f32_3t clear_color;
+    enum Vsync vsync_state;
+    enum AntiAliasing anti_aliasing;
+};
 
-#endif // __DEVICE_STRUCTS_H__
+struct Device {
+    struct Camera camera;
+    struct Input* input;
+    f32 dt;
+    // Hide the glfwWindow behind a void* to avoid polluting with glfw and gl functions
+    void* _glfw;
+};
+
+#endif // __DEVICE_SETTINGS_H__

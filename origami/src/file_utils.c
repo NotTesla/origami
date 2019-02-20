@@ -39,7 +39,7 @@ free_str futils_dump(const char* filename) {
     return contents;
 }
 
-const char* get_extension(const char* filename) {
+const char* futils_get_ext(const char* filename) {
     size_t i = 0;
     size_t extensionIndex = 0;
     char c;
@@ -50,6 +50,10 @@ const char* get_extension(const char* filename) {
         else if (c == '/' || c == '\\') {
             extensionIndex = 0;
         }
+    }
+
+    if (extensionIndex == 0) {
+        extensionIndex = i;
     }
 
     return &filename[extensionIndex];

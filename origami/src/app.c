@@ -1,5 +1,4 @@
 #include "app.h"
-#include "device_structs.h"
 #include "device_interface.h"
 #include "utils.h"
 
@@ -7,19 +6,35 @@
 #include <stdio.h>
 #include <string.h>
 
+struct App app_with_args(const char** argv, size_t argc) {
+    struct App app;
+    // TODO: check for flags passed by the user here, do
+
+    // TODO: load device settings here
+
+    app.device_settings = (struct DeviceSettings) {
+        .window_title = "Origami",
+        .window_mode = WINDOWED,
+        .window_size = (struct u32_2t){.x = 2048, .y = 1024 },
+        .clear_color = (struct f32_3t){.x=.95f,.y=.95f,.z=1.0f},
+        .anti_aliasing = MSAA_X4,
+        .vsync_state = ON,
+    };
+
+    return app;
+}
+
+int app_consume(struct App self) {
+
+    // initialize the device with the device settings
+	device_init(self.device_settings, &self);
+
+    return device_consume(&self);
+}
+
 struct f64_2t last;
 void app_on_device_init(struct App* self) {
     last = (struct f64_2t){ 0.0f, 0.0f };
-    f32 identity[4][4] = {
-        { 1.0f, 0.0f, 0.0f, 0.0f },
-        { 0.0f, 1.0f, 0.0f, 0.0f },
-        { 0.0f, 0.0f, 1.0f, 0.0f },
-        { 0.0f, 0.0f, 0.0f, 1.0f }
-    };
-    memcpy(self->device.camera, identity, 16 * sizeof(f32));
-
-    device_set_clear_color(&self->device, (struct f32_3t){.x=.95f,.y=.95f,.z=1.0f});
-    device_set_vsync(&self->device, ON);
 
     const u16 width = 20;
     const u16 height = 20;
@@ -54,26 +69,23 @@ void app_on_key_event(struct App* self, enum EventState state, struct KeyData ke
 
         // Move camera
         case 87: // w
-            self->device.camera[3][1] -= cam_speed;
+            camera_translate_by(&self->device.camera, (vec3){ 0, cam_speed, 0 });
             break;
         case 68: // d
-            self->device.camera[3][0] -= cam_speed;
+            camera_translate_by(&self->device.camera, (vec3){ cam_speed, 0, 0 });
             break;
         case 83: // s
-            self->device.camera[3][1] += cam_speed;
+            camera_translate_by(&self->device.camera, (vec3){ 0, -cam_speed, 0 });
             break;
         case 65: // a
-            self->device.camera[3][0] += cam_speed;
+            camera_translate_by(&self->device.camera, (vec3){ -cam_speed, 0, 0 });
             break;
 
-        // Zoom in/out
         case 81: // q
-            self->device.camera[0][0] -= cam_speed;
-            self->device.camera[1][1] -= cam_speed;
+            camera_translate_by(&self->device.camera, (vec3) {0,0, -cam_speed});
             break;
         case 69: // e
-            self->device.camera[0][0] += cam_speed;
-            self->device.camera[1][1] += cam_speed;
+            camera_translate_by(&self->device.camera, (vec3) {0,0, cam_speed});
             break;
         // case 32: // space
     }
@@ -84,10 +96,10 @@ void app_on_touch_event(struct App* self, enum EventState state, struct f64_2t p
         struct f64_2t delta = { (pos.x - last.x), -(pos.y - last.y) };
         last = pos;
         for (int i = 0; i < 4; ++i) {
-            vert v = self->device.meshes.data[1].shape.hull.data[i];
+            vert v = self->meshes.data[1].shape.hull.data[i];
             v.x += (i32)(delta.x);
             v.y += (i32)(delta.y);
-            self->device.meshes.data[1].shape.hull.data[i] = v;
+            self->meshes.data[1].shape.hull.data[i] = v;
         }
     }
 }
