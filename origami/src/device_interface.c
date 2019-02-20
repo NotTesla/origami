@@ -161,10 +161,10 @@ void device_init(const struct DeviceSettings settings, struct App* app) {
     glfwSetWindowIcon(window, 1, &glfw_icon);
 
     vert square[4] = {
-        { .x = 0,   .y = 0   },
-        { .x = 0,   .y = 1024 },
-        { .x = 1024,.y = 1024 },
-        { .x = 1024,.y = 0   }
+        { .x = -512,   .y = -512},
+        { .x = -512,   .y = 512 },
+        { .x = 512,.y = 512 },
+        { .x = 512,.y = -512}
     };
     vert square_cursor[4] = {
         { .x = -32,.y = -32},

@@ -6,7 +6,6 @@
 struct Material {
     u32 gl_program;
     u32 gl_uni_mvp;
-    u32 gl_uni_zdex;
     u32 gl_uni_albedo;
     u32 gl_uni_texture;
 };

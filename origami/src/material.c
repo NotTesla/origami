@@ -26,7 +26,7 @@ const char* vertex =
 "void main(void) {\n"
 
 "   vec2 vertex = position * 0.0009765625;\n"
-"   gl_Position = mvp * vec4(vertex.xy, zdex, 1.0);\n"
+"   gl_Position = mvp * vec4(vertex.xy, 0.0, 1.0);\n"
 
 "   _uv = vertex.xy;\n"
 "}";
@@ -90,7 +90,6 @@ struct Material material_with_shader(const char* shader) {
 
     self.gl_program = create_program(fragment, vertex);
     self.gl_uni_mvp = glGetUniformLocation(self.gl_program, "mvp");
-    self.gl_uni_zdex = glGetUniformLocation(self.gl_program, "zdex");
     self.gl_uni_albedo = glGetUniformLocation(self.gl_program, "albedo");
     self.gl_uni_texture = glGetUniformLocation(self.gl_program, "texture");
 

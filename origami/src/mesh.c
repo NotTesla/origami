@@ -2,6 +2,7 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+#include <cglm/affine.h>
 #include <cglm/mat4.h>
 #include <stdio.h>
 #include <math.h>
@@ -65,6 +66,8 @@ struct Mesh mesh_with_vertices(const struct i32_2t* vertices, size_t len) {
 
     glm_mat4_identity(mesh.transform);
 
+    glm_translate_z(mesh.transform, -5.0f);
+
     const i32 dimens = WIDTH * HEIGHT;
     memset_skip(tex + 3, 255, dimens, 4); // set alpha
     memset_skip(tex + 1, 160, dimens, 3); // set green
@@ -118,8 +121,6 @@ void mesh_draw(struct Mesh* self, struct Camera* camera) {
     glm_mat4_mul(camera->projection, mvp, mvp);
 
     glUniformMatrix4fv(self->material->gl_uni_mvp, 1, GL_FALSE, &mvp[0][0]);
-
-    glUniform1f(self->material->gl_uni_zdex, -1.0f);
 
     glUniform4fv(self->material->gl_uni_albedo, 1, (f32[4]){ 1.0f, 1.0f, 1.0f, 1.0f });
 
