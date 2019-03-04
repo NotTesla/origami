@@ -11,8 +11,9 @@ set(CPP "${DEPS}/cpp")
 set(CGLM "${DEPS}/cglm")
 set(GLFW_PATH "${DEPS}/glfw-3.2.1")
 set(RES_PATH "../res")
+set(POLY2TRI "${CPP}/poly2tri/common/*.cpp" "${CPP}/poly2tri/sweep/*.cpp")
 
-FILE(GLOB ORIGAMI "common/*.c" "src/*.c" "src/cpp/*.cpp" "${CGLM}/src/*.c" "${CPP}/*.cpp")
+FILE(GLOB ORIGAMI "common/*.c" "src/*.c" "${POLY2TRI}" "src/cpp/*.cpp" "${CGLM}/src/*.c" "${CPP}/*.cpp")
 # set(ORIGAMI "app.c" "device_interface.c" "file_utils.c" "main.c" "tuple_interface.c" "utils.c")
 # set(SHADERS "${RES_PATH}/shaders/default.vsh" "${RES_PATH}/shaders/default.fsh")
 
