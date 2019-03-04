@@ -178,7 +178,7 @@ void device_init(const struct DeviceSettings settings, struct App* app) {
 
     app->device._glfw = window;
     
-    app->device.camera = camera_with_perspective(90.0f,
+    app->device.camera = camera_with_perspective(60.0f,
         settings.window_size.x / settings.window_size.y,
         .125f, 320.0f);
 

@@ -5,9 +5,6 @@
 #include "rusty_ints.h"
 #include "origami.h"
 
-#define TYPE Vertices
-#include "arraylist_schema.h"
-
 enum CWPolyType { ptSubject, ptClip };
 enum CWClipType { ctIntersection, ctUnion, ctDifference, ctXor };
 
@@ -15,9 +12,9 @@ enum CWClipType { ctIntersection, ctUnion, ctDifference, ctXor };
 extern "C" {
 #endif
 
-    void clipper_push_shape(enum CWPolyType polyType, Vertices shape);
+    void clipper_push_shape(enum CWPolyType polyType, OriVertices shape);
 
-    bool clipper_execute(enum CWClipType operation, struct arraylist_Vertices output);
+    bool clipper_execute(enum CWClipType operation, OriPolygon output);
 
 #ifdef __cplusplus
 }

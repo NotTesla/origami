@@ -96,10 +96,10 @@ void app_on_touch_event(struct App* self, enum EventState state, struct f64_2t p
         struct f64_2t delta = { (pos.x - last.x), -(pos.y - last.y) };
         last = pos;
         for (int i = 0; i < 4; ++i) {
-            vert v = self->meshes.data[1].shape.hull.data[i];
+            vert v = self->meshes.data[1].shape.polygon.data[0].data[i];
             v.x += (i32)(delta.x);
             v.y += (i32)(delta.y);
-            self->meshes.data[1].shape.hull.data[i] = v;
+            self->meshes.data[1].shape.polygon.data[0].data[i] = v;
         }
     }
 }

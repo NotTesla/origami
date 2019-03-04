@@ -70,10 +70,10 @@ DATA_DEF REMOVE_AT(LIST_ALIAS)(LIST_DEF* self, size_t index) {
 // element: the element to remove from the arraylist
 // TODO: add a flag to remove duplicate entries as well
 // TODO: a fn* to check equality might be better...
-DATA_DEF ERASE(LIST_ALIAS)(LIST_DEF* self, DATA_DEF element) {
+void ERASE(LIST_ALIAS)(LIST_DEF* self, DATA_DEF element) {
     for (size_t i = 0; self->len; ++i) {
         if (memcmp(&self->data[i], &element, sizeof(element)) == 0) {
-            return REMOVE_AT(LIST_ALIAS)(self, i);
+            REMOVE_AT(LIST_ALIAS)(self, i);
         }
     }
 }

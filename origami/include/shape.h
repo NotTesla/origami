@@ -7,17 +7,9 @@
 
 #include <stdbool.h>
 
-typedef struct u32_3t tri;
-#define TYPE tri
-#include "arraylist_schema.h"
-
-#define TYPE Vertices
-#include "arrayfat_schema.h"
-
 struct Shape {
-    Vertices hull;
-    struct array_Vertices holes;
-    struct arraylist_tri indices;
+    OriPolygon polygon;
+    OriTriangles indices;
 };
 
 struct Shape shape_init_basic(const vert* hull, size_t h_len, const tri* tris, size_t t_len);

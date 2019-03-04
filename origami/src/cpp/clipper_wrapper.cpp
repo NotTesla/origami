@@ -13,7 +13,7 @@ extern "C" {
     
     void clipper_push_shape(
         enum CWPolyType polyType,
-        Vertices shape) {
+        OriVertices shape) {
 
         Path cppshape((IntPoint*)shape.data, (IntPoint*)(shape.data + shape.len));
         clipper.AddPath(cppshape, (PolyType)polyType, true);
@@ -21,7 +21,7 @@ extern "C" {
 
     bool clipper_execute(
         enum CWClipType operation,
-        struct arraylist_Vertices output) {
+        OriPolygon output) {
         
         auto solution = new PolyTree();
         

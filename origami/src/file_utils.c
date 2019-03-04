@@ -6,7 +6,7 @@ static inline long get_file_size_from_file(FILE* f) {
     if (fseek(f, 0, SEEK_END) != 0) {
         return 0;
     }
-
+    
     long size = ftell(f);
     if (size == -1) {
         return 0;

@@ -22,8 +22,8 @@ void create_vertex_buffer(struct Mesh* self) {
         self->gl_vbuffer);
     glBufferData(
         GL_ARRAY_BUFFER,
-        self->shape.hull.len * sizeof(*self->shape.hull.data),
-        self->shape.hull.data,
+        self->shape.polygon.len * sizeof(*self->shape.polygon.data[0].data),
+        self->shape.polygon.data[0].data,
         GL_STATIC_DRAW);
 
     // generate index buffer
@@ -103,18 +103,15 @@ void mesh_draw(struct Mesh* self, struct Camera* camera) {
 
     glBufferData(
         GL_ARRAY_BUFFER,
-        self->shape.hull.len * sizeof(*self->shape.hull.data),
-        self->shape.hull.data,
+        self->shape.polygon.len * sizeof(*self->shape.polygon.data[0].data),
+        self->shape.polygon.data[0].data,
         GL_STATIC_DRAW);
-    //glBufferData(
-    //    GL_ARRAY_BUFFER,
-    //    self->shape.hull.len * sizeof(*self->shape.hull.data),
-    //    self->shape.hull.data,
-    //    GL_STATIC_DRAW);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, self->gl_tex_buffer);
     glUniform1i(self->material->gl_uni_texture, 0);
+
+    glm_rotate_x(self->transform, 0.02f, self->transform);
 
     mat4 mvp;
     glm_mat4_mul(camera->view, self->transform, mvp);
